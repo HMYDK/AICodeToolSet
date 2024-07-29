@@ -1,7 +1,8 @@
 package com.hmydk.aicode.action;
 
-import com.hmydk.aicode.service.CommitMessageService;
+import com.hmydk.aicode.service.AIBusinessService;
 import com.hmydk.aicode.util.GItCommitUtil;
+import com.hmydk.aicode.util.IdeaDialogUtil;
 import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
@@ -26,7 +27,7 @@ public class GenerateCommitMessageAction extends AnAction {
     private static final Logger LOG = Logger.getInstance(GenerateCommitMessageAction.class);
 
 
-    private final CommitMessageService commitMessageService = new CommitMessageService();
+    private final AIBusinessService aiBusinessService = new AIBusinessService();
 
     @Override
     public void actionPerformed(@NotNull AnActionEvent e) {
@@ -36,14 +37,14 @@ public class GenerateCommitMessageAction extends AnAction {
         }
 
         //check api key
-        if (!commitMessageService.checkApiKeyIsExists()) {
+        if (!aiBusinessService.checkConfig()) {
             Messages.showWarningDialog(project, "Please set your API key first.", "No API Key Set");
             return;
         }
 
         AbstractCommitWorkflowHandler<?, ?> commitWorkflowHandler = (AbstractCommitWorkflowHandler<?, ?>) e.getData(VcsDataKeys.COMMIT_WORKFLOW_HANDLER);
         if (commitWorkflowHandler == null) {
-            Messages.showWarningDialog(project, "No changes selected. Please select files to commit.", "No Changes Selected");
+            IdeaDialogUtil.showWarning(project, "No changes selected. Please select files to commit.", "No Changes Selected");
             return;
         }
 
@@ -58,41 +59,24 @@ public class GenerateCommitMessageAction extends AnAction {
                     String diff = GItCommitUtil.computeDiff(includedChanges, project);
                     String branch = GItCommitUtil.commonBranch(includedChanges, project);
 
-                    String commitMessage = commitMessageService.generateCommitMessage(branch, diff, gitHistoryMsg);
+                    String commitMessage = aiBusinessService.generateCommitMessage(branch, diff, gitHistoryMsg);
 
                     // Use invokeLater to update UI on EDT
                     ApplicationManager.getApplication().invokeLater(() -> {
-                        if (commitMessageService.showCommitMessageDialog(project, commitMessage)) {
+                        if (showCommitMessageDialog(project, commitMessage)) {
                             copyToClipboard(commitMessage);
                             Messages.showInfoMessage(project, "Commit message has been copied to clipboard.", "Message Copied");
                         }
                     });
                 } catch (IllegalArgumentException ex) {
-                    showWarning(project, ex.getMessage(), "AI Commit Message Warning");
+                    IdeaDialogUtil.showWarning(project, ex.getMessage(), "AI Commit Message Warning");
                 } catch (Exception ex) {
-                    showError(project, "Error generating commit message: " + ex.getMessage(), "Error");
+                    IdeaDialogUtil.showError(project, "Error generating commit message: " + ex.getMessage(), "Error");
                 }
             }
         });
     }
 
-    private void showWarning(Project project, String message, String title) {
-        ApplicationManager.getApplication().invokeLater(() ->
-                Messages.showWarningDialog(project, message, title)
-        );
-    }
-
-    private void showError(Project project, String message, String title) {
-        ApplicationManager.getApplication().invokeLater(() ->
-                Messages.showErrorDialog(project, message, title)
-        );
-    }
-
-//    private Collection<Change> getSelectedChanges(Project project) {
-//        ChangeListManager changeListManager = ChangeListManager.getInstance(project);
-//        LocalChangeList activeChangeList = changeListManager.getDefaultChangeList();
-//        return activeChangeList.getChanges();
-//    }
 
     @Override
     public void update(@NotNull AnActionEvent e) {
@@ -108,5 +92,15 @@ public class GenerateCommitMessageAction extends AnAction {
 
     private void copyToClipboard(String text) {
         CopyPasteManager.getInstance().setContents(new StringSelection(text));
+    }
+
+    private boolean showCommitMessageDialog(Project project, String commitMessage) {
+        int result = Messages.showYesNoDialog(
+                project,
+                "Use the following AI-generated commit message?\n\n" + commitMessage,
+                "AI Commit Message",
+                Messages.getQuestionIcon()
+        );
+        return result == Messages.YES;
     }
 }

@@ -1,7 +1,7 @@
 package com.hmydk.aicode.config;
 
-import com.hmydk.aicode.service.CommitMessageService;
-import com.hmydk.aicode.util.PromptUtil;
+import com.hmydk.aicode.service.AIBusinessService;
+import com.hmydk.aicode.prompt.GenerateGItMessagePrompt;
 import com.intellij.ide.BrowserUtil;
 import com.intellij.openapi.options.Configurable;
 import com.intellij.openapi.options.ConfigurationException;
@@ -20,7 +20,7 @@ import java.awt.event.MouseEvent;
 import java.util.Objects;
 
 public class ApiKeyConfigurable implements Configurable {
-    private final CommitMessageService commitMessageService = new CommitMessageService();
+    private final AIBusinessService AIBusinessService = new AIBusinessService();
 
     private ComboBox<String> modelComboBox;
     private JBPasswordField apiKeyField;
@@ -113,7 +113,7 @@ public class ApiKeyConfigurable implements Configurable {
     }
 
     private void resetPrompt() {
-        customPromptArea.setText(PromptUtil.DEFAULT_PROMPT);
+        customPromptArea.setText(GenerateGItMessagePrompt.DEFAULT_PROMPT);
     }
 
     private void validatePrompt() {
@@ -161,7 +161,7 @@ public class ApiKeyConfigurable implements Configurable {
         String apiKey = String.valueOf(apiKeyField.getPassword());
         String language = (String) languageComboBox.getSelectedItem();
 
-        boolean isValid = commitMessageService.validateConfig(model, apiKey, language);
+        boolean isValid = AIBusinessService.validateConfig(model, apiKey, language);
 
         if (isValid) {
             JOptionPane.showMessageDialog(null, "Configuration is valid!", "Verification Success", JOptionPane.INFORMATION_MESSAGE);
@@ -175,7 +175,7 @@ public class ApiKeyConfigurable implements Configurable {
         ApiKeySettings settings = ApiKeySettings.getInstance();
         return !Objects.equals(modelComboBox.getSelectedItem(), settings.getAiModel())
                 || !String.valueOf(apiKeyField.getPassword()).equals(settings.getApiKey())
-                || !Objects.equals(languageComboBox.getSelectedItem(), settings.getCommitLanguage())
+                || !Objects.equals(languageComboBox.getSelectedItem(), settings.getLanguage())
                 || !Objects.equals(customPromptArea.getText(), settings.getCustomPrompt());
     }
 
@@ -184,7 +184,7 @@ public class ApiKeyConfigurable implements Configurable {
         ApiKeySettings settings = ApiKeySettings.getInstance();
         settings.setAiModel((String) modelComboBox.getSelectedItem());
         settings.setApiKey(String.valueOf(apiKeyField.getPassword()));
-        settings.setCommitLanguage((String) languageComboBox.getSelectedItem());
+        settings.setLanguage((String) languageComboBox.getSelectedItem());
         settings.setCustomPrompt(customPromptArea.getText());
     }
 
@@ -195,12 +195,12 @@ public class ApiKeyConfigurable implements Configurable {
         apiKeyField.setText(settings.getApiKey());
         showPasswordCheckBox.setSelected(false);
         apiKeyField.setEchoChar('•');
-        languageComboBox.setSelectedItem(settings.getCommitLanguage());
+        languageComboBox.setSelectedItem(settings.getLanguage());
         customPromptArea.setText(settings.getCustomPrompt());
     }
 
     @Override
     public @NlsContexts.ConfigurableName String getDisplayName() {
-        return "AIGit Commit";
+        return "AICodeToolSet Commit";
     }
 }

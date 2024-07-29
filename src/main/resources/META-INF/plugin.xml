@@ -26,9 +26,9 @@
         <!-- 注册欢迎通知活动 -->
         <postStartupActivity implementation="com.hmydk.aicode.WelcomeNotification"/>
         <!-- 声明通知组 -->
-        <notificationGroup id="AI Git Commit Notifications" displayType="BALLOON"/>
+        <notificationGroup id="AICodeToolSet Notifications" displayType="BALLOON"/>
         <applicationConfigurable instance="com.hmydk.aicode.config.ApiKeyConfigurable"
-                                 displayName="AI Git Commit"/>
+                                 displayName="AICodeToolSet"/>
         <applicationService serviceImplementation="com.hmydk.aicode.config.ApiKeySettings"/>
     </extensions>
 
@@ -40,6 +40,12 @@
                 icon="/icons/git-commit-logo.svg"
                 description="Generate a commit message using AI">
             <add-to-group group-id="Vcs.MessageActionGroup" anchor="first"/>
+        </action>
+
+        <action id="com.hmydk.aicode.action.GenerateEnglishNameAction"
+                class="com.hmydk.aicode.action.GenerateEnglishNameAction"
+                text="AI CodeName Suggest" description="AI CodeName Suggest">
+            <add-to-group group-id="EditorPopupMenu" anchor="last"/>
         </action>
     </actions>
 

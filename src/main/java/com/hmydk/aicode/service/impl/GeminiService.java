@@ -3,20 +3,16 @@ package com.hmydk.aicode.service.impl;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hmydk.aicode.config.ApiKeySettings;
-import com.hmydk.aicode.pojo.GeminiRequestBO;
 import com.hmydk.aicode.service.AIService;
-import org.jetbrains.annotations.NotNull;
+import com.hmydk.aicode.util.AIRequestUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.OutputStream;
 import java.net.HttpURLConnection;
-import java.net.URL;
 import java.nio.charset.StandardCharsets;
-import java.util.List;
 
 /**
  * OpenAIService
@@ -28,10 +24,10 @@ public class GeminiService implements AIService {
     private static final Logger log = LoggerFactory.getLogger(GeminiService.class);
 
     @Override
-    public String generateCommitMessage(String content) {
+    public String getPromptResult(String fullPrompt) {
         String aiResponse;
         try {
-            aiResponse = getAIResponse(ApiKeySettings.getInstance().getApiKey(), content);
+            aiResponse = getAIResponse(ApiKeySettings.getInstance().getApiKey(), fullPrompt);
         } catch (Exception e) {
             e.printStackTrace();
             return e.getMessage();
@@ -41,7 +37,7 @@ public class GeminiService implements AIService {
     }
 
     @Override
-    public boolean checkApiKeyIsExists() {
+    public boolean checkConfig() {
         return !ApiKeySettings.getInstance().getApiKey().isEmpty();
     }
 
@@ -49,7 +45,7 @@ public class GeminiService implements AIService {
     public boolean validateConfig(String model, String apiKey, String language) {
         int statusCode;
         try {
-            HttpURLConnection connection = getHttpURLConnection(apiKey, "hi");
+            HttpURLConnection connection = AIRequestUtil.Gemini.getConnection(apiKey, "hi");
             statusCode = connection.getResponseCode();
         } catch (IOException e) {
             return false;
@@ -60,7 +56,7 @@ public class GeminiService implements AIService {
     }
 
     public static String getAIResponse(String apiKey, String textContent) throws Exception {
-        HttpURLConnection connection = getHttpURLConnection(apiKey, textContent);
+        HttpURLConnection connection = AIRequestUtil.Gemini.getConnection(apiKey, textContent);
 
         StringBuilder response = new StringBuilder();
         try (BufferedReader br = new BufferedReader(new InputStreamReader(connection.getInputStream(), StandardCharsets.UTF_8))) {
@@ -83,27 +79,5 @@ public class GeminiService implements AIService {
             }
         }
         return "sth error when request ai api";
-    }
-
-    private static @NotNull HttpURLConnection getHttpURLConnection(String apiKey, String textContent) throws IOException {
-        String apiUrl = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=" + apiKey;
-        GeminiRequestBO geminiRequestBO = new GeminiRequestBO();
-        geminiRequestBO.setContents(List.of(new GeminiRequestBO.Content(List.of(new GeminiRequestBO.Part(textContent)))));
-        ObjectMapper objectMapper1 = new ObjectMapper();
-        String jsonInputString = objectMapper1.writeValueAsString(geminiRequestBO);
-
-        URL url = new URL(apiUrl);
-        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-        connection.setRequestMethod("POST");
-        connection.setRequestProperty("Content-Type", "application/json");
-        connection.setDoOutput(true);
-        connection.setConnectTimeout(10000); // 连接超时：10秒
-        connection.setReadTimeout(10000); // 读取超时：10秒
-
-        try (OutputStream os = connection.getOutputStream()) {
-            byte[] input = jsonInputString.getBytes(StandardCharsets.UTF_8);
-            os.write(input, 0, input.length);
-        }
-        return connection;
     }
 }
