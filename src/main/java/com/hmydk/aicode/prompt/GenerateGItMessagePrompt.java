@@ -1,7 +1,9 @@
 package com.hmydk.aicode.prompt;
 
-import com.hmydk.aicode.config.ApiKeySettings;
+import com.hmydk.aicode.config.AICodeToolSetSettings;
+import com.hmydk.aicode.config.ConfigConstant;
 
+import javax.swing.*;
 import java.util.List;
 
 /**
@@ -14,7 +16,7 @@ public class GenerateGItMessagePrompt {
     public static final String DEFAULT_PROMPT = generatePrompt4();
 
     public static String constructPrompt(String diff, String branch, List<String> historyMsg) {
-        String content = ApiKeySettings.getInstance().getCustomPrompt();
+        String content = AICodeToolSetSettings.getInstance().getToolConfig(ConfigConstant.GIT_COMMIT_MESSAGE).getCustomPrompt();
         content = content.replace("{branch}", branch);
         if (content.contains("{history}") && historyMsg != null) {
             content = content.replace("{history}", String.join("\n", historyMsg));
@@ -27,7 +29,7 @@ public class GenerateGItMessagePrompt {
         }
 
         if (content.contains("{local}")) {
-            content = content.replace("{local}", ApiKeySettings.getInstance().getLanguage());
+            content = content.replace("{local}", AICodeToolSetSettings.getInstance().getToolConfig(ConfigConstant.GIT_COMMIT_MESSAGE).getLanguage());
         }
 
         return content;
@@ -65,5 +67,13 @@ public class GenerateGItMessagePrompt {
                 Diff:
                     {diff}
                 """;
+    }
+
+    public static void validatePrompt(String prompt) {
+        if (prompt.contains("{diff}") && prompt.contains("{local}")) {
+            JOptionPane.showMessageDialog(null, "Prompt is valid!", "Validation Success", JOptionPane.INFORMATION_MESSAGE);
+        } else {
+            JOptionPane.showMessageDialog(null, "Prompt is invalid. It must contain both {diff} and {local}.", "Validation Failed", JOptionPane.ERROR_MESSAGE);
+        }
     }
 }

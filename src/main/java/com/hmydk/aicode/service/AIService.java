@@ -23,8 +23,7 @@ public interface AIService {
      *
      * @param model
      * @param apiKey
-     * @param language
      * @return
      */
-    boolean validateConfig(String model, String apiKey, String language);
+    boolean validateConfig(String model, String apiKey);
 }

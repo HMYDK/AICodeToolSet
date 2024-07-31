@@ -2,7 +2,7 @@ package com.hmydk.aicode.service.impl;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.hmydk.aicode.config.ApiKeySettings;
+import com.hmydk.aicode.config.AICodeToolSetSettings;
 import com.hmydk.aicode.service.AIService;
 import com.hmydk.aicode.util.AIRequestUtil;
 import org.slf4j.Logger;
@@ -27,7 +27,7 @@ public class GeminiService implements AIService {
     public String getPromptResult(String fullPrompt) {
         String aiResponse;
         try {
-            aiResponse = getAIResponse(ApiKeySettings.getInstance().getApiKey(), fullPrompt);
+            aiResponse = getAIResponse(AICodeToolSetSettings.getInstance().getApiKey(), fullPrompt);
         } catch (Exception e) {
             e.printStackTrace();
             return e.getMessage();
@@ -38,11 +38,11 @@ public class GeminiService implements AIService {
 
     @Override
     public boolean checkConfig() {
-        return !ApiKeySettings.getInstance().getApiKey().isEmpty();
+        return !AICodeToolSetSettings.getInstance().getApiKey().isEmpty();
     }
 
     @Override
-    public boolean validateConfig(String model, String apiKey, String language) {
+    public boolean validateConfig(String model, String apiKey) {
         int statusCode;
         try {
             HttpURLConnection connection = AIRequestUtil.Gemini.getConnection(apiKey, "hi");

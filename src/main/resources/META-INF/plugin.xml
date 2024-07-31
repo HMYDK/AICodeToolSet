@@ -21,9 +21,9 @@
         <!-- 声明通知组 -->
         <notificationGroup id="AICodeToolSet Notifications" displayType="BALLOON"/>
         <!--UI配置-->
-        <applicationConfigurable instance="com.hmydk.aicode.config.ApiKeyConfigurable"
+        <applicationConfigurable instance="com.hmydk.aicode.config.AICodeToolSetConfigurable"
                                  displayName="AICodeToolSet"/>
-        <applicationService serviceImplementation="com.hmydk.aicode.config.ApiKeySettings"/>
+        <applicationService serviceImplementation="com.hmydk.aicode.config.AICodeToolSetSettings"/>
     </extensions>
 
     <actions>

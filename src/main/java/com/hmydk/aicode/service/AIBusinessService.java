@@ -1,7 +1,8 @@
 package com.hmydk.aicode.service;
 
 
-import com.hmydk.aicode.config.ApiKeySettings;
+import com.hmydk.aicode.config.AICodeToolSetSettings;
+import com.hmydk.aicode.config.ConfigConstant;
 import com.hmydk.aicode.prompt.GenerateCodeNamePrompt;
 import com.hmydk.aicode.prompt.GenerateGItMessagePrompt;
 import com.hmydk.aicode.service.impl.GeminiService;
@@ -19,8 +20,8 @@ public class AIBusinessService {
         return aiService.checkConfig();
     }
 
-    public boolean validateConfig(String model, String apiKey, String language) {
-        return aiService.validateConfig(model, apiKey, language);
+    public boolean validateConfig(String model, String apiKey) {
+        return aiService.validateConfig(model, apiKey);
     }
 
     public String generateCommitMessage(String branch, String diff, List<String> gitHistoryMsg) {
@@ -29,7 +30,7 @@ public class AIBusinessService {
     }
 
     public String generateAICodeName(String input) {
-        input = GenerateCodeNamePrompt.getPrompt(ApiKeySettings.getInstance().getLanguage(), "Variable", input);
+        input = GenerateCodeNamePrompt.getPrompt(AICodeToolSetSettings.getInstance().getToolConfig(ConfigConstant.CODE_NAME_SUGGEST).getLanguage(), "Variable", input);
         return aiService.getPromptResult(input);
     }
 
