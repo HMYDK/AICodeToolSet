@@ -21,8 +21,10 @@
         <!-- 声明通知组 -->
         <notificationGroup id="AICodeToolSet Notifications" displayType="BALLOON"/>
         <!--UI配置-->
-        <applicationConfigurable instance="com.hmydk.aicode.config.AICodeToolSetConfigurable"
-                                 displayName="AICodeToolSet"/>
+        <applicationConfigurable groupId="tools"
+                                 instance="com.hmydk.aicode.config.AICodeToolSetConfigurable"
+                                 id="com.hmydk.aicode.config.AICodeToolSetConfigurable"
+                                 displayName="AI Code Tool Set"/>
         <applicationService serviceImplementation="com.hmydk.aicode.config.AICodeToolSetSettings"/>
     </extensions>
 

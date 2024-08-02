@@ -7,11 +7,11 @@ import com.intellij.ide.BrowserUtil;
 import com.intellij.openapi.options.Configurable;
 import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.openapi.ui.ComboBox;
-import com.intellij.openapi.util.NlsContexts;
 import com.intellij.ui.components.JBLabel;
 import com.intellij.ui.components.JBPasswordField;
 import com.intellij.ui.components.JBTextArea;
 import com.intellij.util.ui.JBUI;
+import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
@@ -258,21 +258,6 @@ public class AICodeToolSetConfigurable implements Configurable {
         return comboBox;
     }
 
-//    private void verifyConfig(boolean showSuccess) {
-//        String model = (String) modelComboBox.getSelectedItem();
-//        String apiKey = String.valueOf(apiKeyField.getPassword());
-//
-//        boolean isValid = AIBusinessService.validateConfig(model, apiKey);
-//
-//        if (isValid) {
-//            if (showSuccess){
-//                JOptionPane.showMessageDialog(null, "Configuration is valid!", "Verification Success", JOptionPane.INFORMATION_MESSAGE);
-//            }
-//        } else {
-//            JOptionPane.showMessageDialog(null, "Configuration is invalid. Please check your settings.", "Verification Failed", JOptionPane.ERROR_MESSAGE);
-//        }
-//    }
-
     private void verifyConfig(boolean showSuccess) {
         String model = (String) modelComboBox.getSelectedItem();
         String apiKey = String.valueOf(apiKeyField.getPassword());
@@ -374,9 +359,17 @@ public class AICodeToolSetConfigurable implements Configurable {
         codeNameSuggestCustomPromptArea.setText(GenerateCodeNamePrompt.DEFAULT_PROMPT);
     }
 
+
+    @Nls(capitalization = Nls.Capitalization.Title)
     @Override
-    public @NlsContexts.ConfigurableName String getDisplayName() {
-        return "AICodeToolSet Configuration";
+    public String getDisplayName() {
+        return "AI Code Tool Set";
+    }
+
+    @Nullable
+    @Override
+    public String getHelpTopic() {
+        return "preference.AICodeToolSetConfigurable";
     }
 
 }
