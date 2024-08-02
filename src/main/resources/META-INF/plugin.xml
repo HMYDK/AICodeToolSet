@@ -40,7 +40,7 @@
                 class="com.hmydk.aicode.action.GenerateEnglishNameAction"
                 text="AI CodeName Suggest"
                 icon="/icons/git-commit-logo.svg"
-                description="AI CodeName Suggest">
+                description="Generate a code name suggest using AI">
             <add-to-group group-id="EditorPopupMenu" anchor="first"/>
         </action>
     </actions>
@@ -48,11 +48,11 @@
 
     <change-notes>
         <![CDATA[
-        <h4>v0.0.1</h4>
+        <h4>v1.0.0</h4>
         <ul>
-        <li>support code name suggest</li>
-        <li>support generate git message</li>
-            <li>support gemini</li>
+            <li>support code name suggest</li>
+            <li>support generate git message</li>
+            <li>use gemini api as default</li>
         </ul>
         ]]>
     </change-notes>

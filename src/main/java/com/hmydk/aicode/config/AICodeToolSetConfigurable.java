@@ -55,7 +55,7 @@ public class AICodeToolSetConfigurable implements Configurable {
         tabbedPane.addTab("Code Name Suggest", createCodeNameSuggestPanel());
 
         mainPanel.add(tabbedPane, BorderLayout.CENTER);
-        mainPanel.add(createHintLabel(), BorderLayout.SOUTH);
+//        mainPanel.add(createHintLabel(), BorderLayout.SOUTH);
 
         return mainPanel;
     }
@@ -64,7 +64,7 @@ public class AICodeToolSetConfigurable implements Configurable {
         modelComboBox = new ComboBox<>(new String[]{"Gemini"});
         apiKeyField = new JBPasswordField();
         showPasswordCheckBox = new JCheckBox("Show Key");
-        verifyModelConfigButton = new JButton("Verify Config");
+        verifyModelConfigButton = new JButton("Check Connection");
 
         gitCommitMessageLanguageComboBox = new ComboBox<>(ConfigConstant.SUPPORTED_LANGUAGES);
         codeNameSuggestLanguageComboBox = new ComboBox<>(ConfigConstant.SUPPORTED_LANGUAGES);
@@ -84,21 +84,45 @@ public class AICodeToolSetConfigurable implements Configurable {
     }
 
     private JPanel createCommonSettingsPanel() {
-        JPanel panel = new JPanel(new GridBagLayout());
+        JPanel mainPanel = new JPanel(new BorderLayout());
+        JPanel formPanel = new JPanel(new GridBagLayout());
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.insets = JBUI.insets(5);
         gbc.fill = GridBagConstraints.HORIZONTAL;
         gbc.weightx = 1.0;
 
-        addFormComponent(panel, gbc, "LLM Client", createSizedComboBox(modelComboBox));
-        addFormComponent(panel, gbc, "API Key", createApiKeyPanel());
-
+        // Add AI model selection
         gbc.gridx = 0;
-        gbc.gridy++;
-        gbc.gridwidth = 2;
-        panel.add(verifyModelConfigButton, gbc);
+        gbc.gridy = 0;
+        formPanel.add(new JBLabel("LLM Client"), gbc);
+        gbc.gridx = 1;
+        formPanel.add(createSizedComboBox(modelComboBox), gbc);
 
-        return panel;
+        // Add API Key section
+        gbc.gridx = 0;
+        gbc.gridy = 1;
+        formPanel.add(new JBLabel("API Key"), gbc);
+        gbc.gridx = 1;
+        formPanel.add(createApiKeyPanel(), gbc);
+
+        // Add verify button (now in a separate panel)
+        JPanel verifyButtonPanel = new JPanel(new BorderLayout());
+        verifyModelConfigButton.setPreferredSize(new Dimension(130, 30)); // Set a preferred size
+        verifyButtonPanel.add(verifyModelConfigButton, BorderLayout.EAST);
+        gbc.gridx = 0;
+        gbc.gridy = 3;
+        gbc.gridwidth = 2;
+        formPanel.add(verifyButtonPanel, gbc);
+
+        // Add hint label
+        gbc.gridx = 0;
+        gbc.gridy = 4;
+        gbc.gridwidth = 2;
+        formPanel.add(createHintLabel(), gbc);
+
+        mainPanel.add(formPanel, BorderLayout.NORTH);
+
+        return mainPanel;
     }
 
     private JPanel createGitCommitMessagePanel() {
@@ -234,19 +258,65 @@ public class AICodeToolSetConfigurable implements Configurable {
         return comboBox;
     }
 
+//    private void verifyConfig(boolean showSuccess) {
+//        String model = (String) modelComboBox.getSelectedItem();
+//        String apiKey = String.valueOf(apiKeyField.getPassword());
+//
+//        boolean isValid = AIBusinessService.validateConfig(model, apiKey);
+//
+//        if (isValid) {
+//            if (showSuccess){
+//                JOptionPane.showMessageDialog(null, "Configuration is valid!", "Verification Success", JOptionPane.INFORMATION_MESSAGE);
+//            }
+//        } else {
+//            JOptionPane.showMessageDialog(null, "Configuration is invalid. Please check your settings.", "Verification Failed", JOptionPane.ERROR_MESSAGE);
+//        }
+//    }
+
     private void verifyConfig(boolean showSuccess) {
         String model = (String) modelComboBox.getSelectedItem();
         String apiKey = String.valueOf(apiKeyField.getPassword());
 
-        boolean isValid = AIBusinessService.validateConfig(model, apiKey);
+        // 创建一个模态对话框来显示加载消息
+        Window parentWindow = SwingUtilities.getWindowAncestor(verifyModelConfigButton);
+        JDialog loadingDialog = new JDialog(parentWindow, "Verifying", Dialog.ModalityType.APPLICATION_MODAL);
+        JPanel panel = new JPanel(new BorderLayout(10, 10));
+        panel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        panel.add(new JLabel("Checking configuration..."), BorderLayout.CENTER);
+        JProgressBar progressBar = new JProgressBar();
+        progressBar.setIndeterminate(true);
+        panel.add(progressBar, BorderLayout.SOUTH);
+        loadingDialog.add(panel);
+        loadingDialog.pack();
+        loadingDialog.setLocationRelativeTo(parentWindow);
 
-        if (isValid) {
-            if (showSuccess){
-                JOptionPane.showMessageDialog(null, "Configuration is valid!", "Verification Success", JOptionPane.INFORMATION_MESSAGE);
+        // 在新线程中执行验证，以避免UI冻结
+        SwingWorker<Boolean, Void> worker = new SwingWorker<Boolean, Void>() {
+            @Override
+            protected Boolean doInBackground() throws Exception {
+                return AIBusinessService.validateConfig(model, apiKey);
             }
-        } else {
-            JOptionPane.showMessageDialog(null, "Configuration is invalid. Please check your settings.", "Verification Failed", JOptionPane.ERROR_MESSAGE);
-        }
+
+            @Override
+            protected void done() {
+                loadingDialog.dispose();
+                try {
+                    boolean isValid = get();
+                    if (isValid) {
+                        if (showSuccess) {
+                            JOptionPane.showMessageDialog(parentWindow, "Configuration is valid!", "Verification Success", JOptionPane.INFORMATION_MESSAGE);
+                        }
+                    } else {
+                        JOptionPane.showMessageDialog(parentWindow, "Configuration is invalid. Please check your settings.", "Verification Failed", JOptionPane.ERROR_MESSAGE);
+                    }
+                } catch (Exception e) {
+                    JOptionPane.showMessageDialog(parentWindow, "An error occurred during verification: " + e.getMessage(), "Verification Error", JOptionPane.ERROR_MESSAGE);
+                }
+            }
+        };
+
+        worker.execute();
+        loadingDialog.setVisible(true);
     }
 
     @Override
@@ -298,9 +368,10 @@ public class AICodeToolSetConfigurable implements Configurable {
         apiKeyField.setEchoChar('•');
 
         gitCommitMessageLanguageComboBox.setSelectedItem(gitConfig.getLanguage());
-        gitCommitMessageCustomPromptArea.setText(gitConfig.getCustomPrompt());
         codeNameSuggestLanguageComboBox.setSelectedItem(codeNameSuggestConfig.getLanguage());
-        codeNameSuggestCustomPromptArea.setText(codeNameSuggestConfig.getCustomPrompt());
+
+        gitCommitMessageCustomPromptArea.setText(GenerateGItMessagePrompt.DEFAULT_PROMPT);
+        codeNameSuggestCustomPromptArea.setText(GenerateCodeNamePrompt.DEFAULT_PROMPT);
     }
 
     @Override
