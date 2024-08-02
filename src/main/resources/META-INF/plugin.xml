@@ -33,7 +33,7 @@
         <action id="AICommitMessage.Generate"
                 class="com.hmydk.aicode.action.GenerateCommitMessageAction"
                 text="Generate AI Commit Message"
-                icon="/icons/git-commit-logo.svg"
+                icon="/icons/icon.svg"
                 description="Generate a commit message using AI">
             <add-to-group group-id="Vcs.MessageActionGroup" anchor="first"/>
         </action>
@@ -41,7 +41,7 @@
         <action id="com.hmydk.aicode.action.GenerateEnglishNameAction"
                 class="com.hmydk.aicode.action.GenerateEnglishNameAction"
                 text="AI CodeName Suggest"
-                icon="/icons/git-commit-logo.svg"
+                icon="/icons/icon.svg"
                 description="Generate a code name suggest using AI">
             <add-to-group group-id="EditorPopupMenu" anchor="first"/>
         </action>
