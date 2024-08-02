@@ -14,12 +14,12 @@ import org.jetbrains.annotations.Nullable;
 
 public class WelcomeNotification implements ProjectActivity {
 
-    private static final String NOTIFICATION_GROUP_ID = "AI Git Commit Notifications";
-    private static final String PLUGIN_NAME = "AI Git Commit";
-    private static final String WELCOME_TITLE = "Welcome to AI Git Commit!";
-    private static final String WELCOME_CONTENT = "Thank you for installing AI Git Commit. " +
+    private static final String NOTIFICATION_GROUP_ID = "AICodeToolSet Notifications";
+    private static final String PLUGIN_NAME = "AICodeToolSet";
+    private static final String WELCOME_TITLE = "Welcome to AICodeToolSet!";
+    private static final String WELCOME_CONTENT = "Thank you for installing AICodeToolSet. " +
             "To get started, please configure your API key in the settings.";
-    private static final String PLUGIN_VERSION_PROPERTY = "com.hmydk.aigit.version";
+    private static final String PLUGIN_VERSION_PROPERTY = "com.hmydk.aicode.version";
 
     @Nullable
     @Override
@@ -42,7 +42,7 @@ public class WelcomeNotification implements ProjectActivity {
     }
 
     private String getCurrentPluginVersion() {
-        return PluginManagerCore.getPlugin(PluginId.getId("com.hmydk.aigit")).getVersion();
+        return PluginManagerCore.getPlugin(PluginId.getId("com.hmydk.aicode")).getVersion();
     }
 
     private void showWelcomeNotification(@NotNull Project project) {

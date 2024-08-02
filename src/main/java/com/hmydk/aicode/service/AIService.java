@@ -7,10 +7,23 @@ package com.hmydk.aicode.service;
  */
 public interface AIService {
 
-    String generateCommitMessage(String content);
+    /**
+     * @param fullPrompt 拼装好的prompt
+     * @return git message
+     */
+    String getPromptResult(String fullPrompt);
 
-    boolean checkApiKeyIsExists();
+    /**
+     * @return 检查结果
+     */
+    boolean checkConfig();
 
-
-    boolean validateConfig(String model, String apiKey, String language);
+    /**
+     * 配置页面：校验配置是否正确
+     *
+     * @param model
+     * @param apiKey
+     * @return
+     */
+    boolean validateConfig(String model, String apiKey);
 }
