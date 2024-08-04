@@ -7,7 +7,13 @@
     <vendor email="paranoia_zk@yeah.net">HMYDK</vendor>
 
     <description><![CDATA[
-    This plugin integrates advanced AI tools into your daily workflow.
+<p>This plugin seamlessly incorporates AI capabilities into your everyday development tasks, enhancing productivity and streamlining your workflow. Key features include:</p>
+<ul>
+<li>Intelligent code naming suggestions</li>
+<li>Automated generation of meaningful Git commit messages</li>
+<li>New features are under development...</li>
+</ul>
+<p>Experience the power of AI-assisted development with our intuitive toolset.</p>
     ]]></description>
 
     <depends>com.intellij.modules.lang</depends>
